@@ -18,15 +18,23 @@ function getNestedValue(
   dictionary: TranslationDictionary,
   key: string,
 ): string | undefined {
-  const value = key.split(".").reduce<unknown>((current, part) => {
-    if (typeof current !== "object" || current === null || !(part in current)) {
+  const parts = key.split(".");
+
+  let current: unknown = dictionary;
+
+  for (const part of parts) {
+    if (
+      typeof current !== "object" ||
+      current === null ||
+      !Object.prototype.hasOwnProperty.call(current, part)
+    ) {
       return undefined;
     }
 
-    return (current as Record<string, unknown>)[part];
-  }, dictionary);
+    current = (current as Record<string, unknown>)[part];
+  }
 
-  return typeof value === "string" ? value : undefined;
+  return typeof current === "string" ? current : undefined;
 }
 
 function interpolate(message: string, params?: TranslationParams): string {
@@ -43,21 +51,25 @@ export function useTranslation() {
   const context = useContext(LanguageContext);
 
   if (!context) {
-    throw new Error("useTranslation must be used inside LanguageProvider.");
+    throw new Error(
+      "useTranslation must be used inside LanguageProvider. Check app/layout.tsx.",
+    );
   }
 
   const { locale, setLocale, messages } = context;
 
   const t = useCallback(
     (key: string, params?: TranslationParams): string => {
-      const currentTranslation = getNestedValue(messages, key);
+      const translation = getNestedValue(messages, key);
 
-      if (currentTranslation !== undefined) {
-        return interpolate(currentTranslation, params);
+      if (translation !== undefined) {
+        return interpolate(translation, params);
       }
 
       if (process.env.NODE_ENV === "development") {
-        console.warn(`[i18n] Missing translation: ${locale}.${key}`);
+        console.warn(
+          `[i18n] Missing translation key: "${key}" for locale "${locale}"`,
+        );
       }
 
       return interpolate(key, params);

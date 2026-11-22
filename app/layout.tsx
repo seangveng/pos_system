@@ -9,14 +9,12 @@ import { CartProvider } from "@/contexts/cart-context";
 import { SidebarProvider } from "@/contexts/sidebar-contexts";
 import { LanguageProvider } from "@/contexts/language-context";
 
-// English font
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
   display: "swap",
 });
 
-// Khmer font
 const kantumruy = Kantumruy_Pro({
   variable: "--font-kantumruy",
   subsets: ["khmer", "latin"],
@@ -57,7 +55,10 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
 
-      <body className={`${geistSans.variable} ${kantumruy.variable}`}>
+      <body
+        className={`${geistSans.variable} ${kantumruy.variable}`}
+        suppressHydrationWarning
+      >
         <LanguageProvider>
           <CartProvider>
             <SidebarProvider>

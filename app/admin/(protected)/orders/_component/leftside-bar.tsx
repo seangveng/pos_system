@@ -26,7 +26,7 @@ import { useSidebar } from "@/contexts/sidebar-contexts";
 import { useLanguage } from "@/contexts/language-context";
 import { useTranslation } from "@/hooks/use-translation";
 
-import { LOCALE_LABELS, LOCALE_FLAGS, type Locale } from "@/lib/i18n";
+import { LOCALE_LABELS, type Locale } from "@/lib/i18n";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -56,6 +56,51 @@ interface SidebarMenuLink {
   label: string;
   href: string;
   badge?: string;
+}
+
+/* =========================================================
+   LANGUAGE FLAG - IMAGE VERSION
+========================================================= */
+
+function LanguageFlag({ locale }: { locale: Locale }) {
+  const flagSrc = locale === "en" ? "/image/en.webp" : "/image/km.webp";
+
+  const flagAlt =
+    locale === "en" ? "English - United Kingdom" : "Khmer - Cambodia";
+
+  return (
+    <span
+      className="
+        flex
+        h-7
+        w-7
+        shrink-0
+        items-center
+        justify-center
+        overflow-hidden
+        rounded-full
+        border
+        border-gray-200
+        bg-white
+        shadow-sm
+      "
+      aria-label={flagAlt}
+    >
+      <Image
+        src={flagSrc}
+        alt={flagAlt}
+        width={28}
+        height={28}
+        unoptimized
+        className="
+          h-full
+          w-full
+          rounded-full
+          object-cover
+        "
+      />
+    </span>
+  );
 }
 
 /* =========================================================
@@ -433,8 +478,6 @@ export function Sidebar() {
           isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
         )}
       >
-        {/* SMALL LANGUAGE SWITCHER */}
-
         {/* LOGO */}
 
         <div
@@ -481,7 +524,7 @@ export function Sidebar() {
           )}
         </div>
 
-        {/* COMPACT WIDE GLASS LANGUAGE SWITCHER */}
+        {/* CIRCULAR COUNTRY FLAG LANGUAGE SWITCHER */}
 
         <div className="flex justify-center border-b border-gray-100 px-3 py-2">
           <DropdownMenu>
@@ -495,7 +538,7 @@ export function Sidebar() {
                 className="
           group
           relative
-          h-8
+          h-9
           w-full
           justify-between
           rounded-full
@@ -516,24 +559,12 @@ export function Sidebar() {
         "
               >
                 <span className="flex items-center gap-2">
-                  <Languages className="h-3.5 w-3.5 text-teal-600" />
+                  <LanguageFlag locale={locale} />
 
-                  <span className="text-sm leading-none">
-                    {LOCALE_FLAGS[locale]}
+                  <span className="text-sm font-medium text-slate-700">
+                    {LOCALE_LABELS[locale]}
                   </span>
-
-                  {!isCollapsed && (
-                    <span className="font-semibold">
-                      {LOCALE_LABELS[locale]}
-                    </span>
-                  )}
                 </span>
-
-                {!isCollapsed && (
-                  <span className="text-[10px] font-semibold tracking-wider text-slate-400">
-                    {locale.toUpperCase()}
-                  </span>
-                )}
               </Button>
             </DropdownMenuTrigger>
 
@@ -562,7 +593,7 @@ export function Sidebar() {
                       : "text-slate-600",
                   )}
                 >
-                  <span className="text-lg">{LOCALE_FLAGS[language]}</span>
+                  <LanguageFlag locale={language} />
 
                   <span className="flex-1 text-sm font-medium">
                     {LOCALE_LABELS[language]}
