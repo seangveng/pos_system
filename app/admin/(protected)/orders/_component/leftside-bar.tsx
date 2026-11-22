@@ -120,7 +120,7 @@ export function Sidebar() {
   const [transactionCount, setTransactionCount] = React.useState(0);
 
   // Dynamic company branding.
-  const [storeName, setStoreName] = React.useState("Happy Birds");
+  const [storeName, setStoreName] = React.useState("BunChheang Cafe");
   const [storeLogo, setStoreLogo] = React.useState("");
 
   // Current authenticated role.
@@ -155,7 +155,7 @@ export function Sidebar() {
       setStoreName(
         typeof settings?.storeName === "string" && settings.storeName.trim()
           ? settings.storeName.trim()
-          : "Happy Birds",
+          : "BunChheang Cafe",
       );
 
       setStoreLogo(typeof settings?.logo === "string" ? settings.logo : "");

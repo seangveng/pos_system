@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "Happy Birds",
+    "appName": "BunChheang Cafe",
     "dashboard": "ផ្ទាំងគ្រប់គ្រង",
     "overview": "ទិដ្ឋភាពទូទៅ",
     "home": "ទំព័រដើម",
@@ -57,7 +57,7 @@
     "logout": "ចាកចេញ",
     "language": "ភាសា",
     "english": "អង់គ្លេស",
-    "khmer": "ខ្មែរ",
+    "khmer": "ភាសាខ្មែរ",
     "currency": "រូបិយប័ណ្ណ",
     "optional": "មិនចាំបាច់",
     "required": "ចាំបាច់",

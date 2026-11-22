@@ -6,7 +6,7 @@ export type Locale = (typeof SUPPORTED_LOCALES)[number];
 
 export const LOCALE_LABELS: Record<Locale, string> = {
   en: "English",
-  km: "ខ្មែរ",
+  km: "ភាសាខ្មែរ",
 };
 
 export const LOCALE_FLAGS: Record<Locale, string> = {
