@@ -204,22 +204,22 @@
       "totalProducts": "ផលិតផលសរុប",
       "productsAcrossCategories": "ផលិតផលនៅគ្រប់ប្រភេទ",
       "activeCategories": "ប្រភេទផលិតផលសកម្ម",
-      "categoriesWithActiveProducts": "ប្រភេទដែលមានផលិតផលកំពុងដំណើរការ"
-    },
-    "searchPlaceholder": "ស្វែងរកប្រភេទផលិតផល...",
-    "grid": {
-      "showing": "កំពុងបង្ហាញប្រភេទផលិតផល {{count}}",
-      "noCategoriesYet": "មិនទាន់មានប្រភេទផលិតផលនៅឡើយទេ",
-      "addFirstCategory": "បន្ថែមប្រភេទផលិតផលដំបូងរបស់អ្នក ដើម្បីរៀបចំផលិតផល។",
-      "noMatchingCategories": "រកមិនឃើញប្រភេទផលិតផលដែលត្រូវគ្នាទេ",
-      "tryAnotherSearch": "សូមសាកល្បងពាក្យស្វែងរកផ្សេងទៀត។"
-    },
-    "card": {
-      "category": "ប្រភេទផលិតផល",
-      "edit": "កែប្រែ",
-      "delete": "លុប",
-      "noDescription": "មិនមានការពិពណ៌នា",
-      "products": "ផលិតផល"
+      "categoriesWithActiveProducts": "ប្រភេទដែលមានផលិតផលកំពុងដំណើរការ",
+      "searchPlaceholder": "ស្វែងរកប្រភេទផលិតផល...",
+      "grid": {
+        "showing": "កំពុងបង្ហាញប្រភេទផលិតផល {{count}}",
+        "noCategoriesYet": "មិនទាន់មានប្រភេទផលិតផលនៅឡើយទេ",
+        "addFirstCategory": "បន្ថែមប្រភេទផលិតផលដំបូងរបស់អ្នក ដើម្បីរៀបចំផលិតផល។",
+        "noMatchingCategories": "រកមិនឃើញប្រភេទផលិតផលដែលត្រូវគ្នាទេ",
+        "tryAnotherSearch": "សូមសាកល្បងពាក្យស្វែងរកផ្សេងទៀត។"
+      },
+      "card": {
+        "category": "ប្រភេទផលិតផល",
+        "edit": "កែប្រែ",
+        "delete": "លុប",
+        "noDescription": "មិនមានការពិពណ៌នា",
+        "products": "ផលិតផល"
+      }
     }
   },
   "orders": {

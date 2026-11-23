@@ -1,10 +1,18 @@
 import mongoose from "mongoose";
 
-const MONGODB_URI = process.env.MONGODB_URI;
+// ============================================================
+// MONGODB CONFIGURATION
+// ============================================================
+
+const MONGODB_URI: string | undefined = process.env.MONGODB_URI;
 
 if (!MONGODB_URI) {
   throw new Error("Please define MONGODB_URI in .env.local");
 }
+
+// ============================================================
+// MONGOOSE CACHE
+// ============================================================
 
 type MongooseCache = {
   conn: typeof mongoose | null;
@@ -23,6 +31,10 @@ const cached: MongooseCache =
     promise: null,
   });
 
+// ============================================================
+// DATABASE CONNECTION
+// ============================================================
+
 export default async function connectDB(): Promise<typeof mongoose> {
   // Reuse a healthy connection.
   if (mongoose.connection.readyState === 1) {
@@ -32,7 +44,7 @@ export default async function connectDB(): Promise<typeof mongoose> {
 
   // Reuse an ongoing connection attempt.
   if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGODB_URI, {
+    cached.promise = mongoose.connect(MONGODB_URI as string, {
       bufferCommands: false,
 
       // Avoid waiting several minutes for an unavailable server.

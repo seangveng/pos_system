@@ -53,16 +53,6 @@ const PromoSchema = new Schema<IPromo>(
       type: Number,
       required: true,
       min: 0.01,
-      validate: {
-        validator: function (this: IPromo, value: number): boolean {
-          if (this.discountType === "percentage") {
-            return value <= 100;
-          }
-
-          return true;
-        },
-        message: "Percentage discount cannot exceed 100%.",
-      },
     },
 
     minimumOrder: {
@@ -106,6 +96,21 @@ const PromoSchema = new Schema<IPromo>(
     timestamps: true,
   },
 );
+
+// ============================================================
+// CUSTOM VALIDATION
+// ============================================================
+
+// Percentage discounts cannot exceed 100%.
+PromoSchema.pre("validate", function () {
+  if (this.discountType === "percentage" && this.discountValue > 100) {
+    this.invalidate("discountValue", "Percentage discount cannot exceed 100%.");
+  }
+});
+
+// ============================================================
+// MODEL
+// ============================================================
 
 const Promo: Model<IPromo> =
   mongoose.models.Promo || mongoose.model<IPromo>("Promo", PromoSchema);

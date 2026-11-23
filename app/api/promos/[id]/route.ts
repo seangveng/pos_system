@@ -401,13 +401,17 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
 
     const validation = validatePromo(body);
 
-    if ("error" in validation) {
+    if (validation.error !== undefined) {
       return errorResponse(validation.error, 400);
     }
 
-    await connectDB();
-
     const data = validation.data;
+
+    if (!data) {
+      return errorResponse("Invalid promotion data.", 400);
+    }
+
+    await connectDB();
 
     // Check whether the promotion exists.
     const existingPromo = await Promo.findById(id);

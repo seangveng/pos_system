@@ -387,6 +387,8 @@ export async function GET(request: NextRequest) {
       return unauthorizedResponse();
     }
 
+    await connectDB();
+
     const promos = await Promo.find({}).sort({ createdAt: -1 }).lean().exec();
 
     return jsonResponse({
@@ -457,7 +459,7 @@ export async function POST(request: NextRequest) {
     // Validate promotion.
     const validation = validatePromo(body);
 
-    if (validation.error) {
+    if (validation.error !== undefined) {
       return jsonResponse(
         {
           success: false,
@@ -467,9 +469,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Explicitly narrow validated data.
+    const data = validation.data;
+
+    if (!data) {
+      return jsonResponse(
+        {
+          success: false,
+          error: "Invalid promotion data.",
+        },
+        400,
+      );
+    }
+
     // Check duplicate code.
     const existingPromo = await Promo.findOne({
-      code: validation.data.code,
+      code: data.code,
     })
       .select("_id")
       .lean()
@@ -486,7 +501,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create promotion.
-    const promo = await Promo.create(validation.data);
+    const promo = await Promo.create(data);
 
     return jsonResponse(
       {

@@ -24,6 +24,7 @@ async function authorize(request: NextRequest): Promise<boolean> {
 
     const role = String(session.role || "").toUpperCase();
 
+    // OWNER authentication uses the configured admin email.
     if (role === "OWNER") {
       return (
         String(session.email || "").toLowerCase() ===
@@ -31,22 +32,27 @@ async function authorize(request: NextRequest): Promise<boolean> {
       );
     }
 
+    // Only ADMIN and STAFF can continue to database validation.
     if (role !== "ADMIN" && role !== "STAFF") {
       return false;
     }
 
     await connectDB();
 
-    const user = await User.findById(session.userId)
+    // AdminSession contains email, not userId.
+    const user = await User.findOne({
+      email: String(session.email || "").toLowerCase(),
+    })
       .select("role status email")
       .lean();
 
-    if (!user || user.status !== "active") {
+    if (!user || String(user.status).toUpperCase() !== "ACTIVE") {
       return false;
     }
 
     return String(user.role).toUpperCase() === role;
   } catch (error) {
+    console.error("Product authorization error:", error);
     return false;
   }
 }
@@ -90,6 +96,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
       },
     );
   } catch (error) {
+    console.error("Get product error:", error);
     return errorResponse("Unable to load product.", 500);
   }
 }
@@ -109,6 +116,8 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     if (!validProductId(id)) {
       return errorResponse("Invalid product ID.", 400);
     }
+
+    await connectDB();
 
     const body = await request.json();
 
@@ -233,6 +242,8 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       product,
     });
   } catch (error: unknown) {
+    console.error("Update product error:", error);
+
     if (
       typeof error === "object" &&
       error !== null &&
@@ -278,6 +289,7 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
       productId: Number(id),
     });
   } catch (error) {
+    console.error("Delete product error:", error);
     return errorResponse("Unable to delete product.", 500);
   }
 }

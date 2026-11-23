@@ -919,41 +919,39 @@ export async function POST(request: NextRequest) {
 
       const status = isStaffOrder ? "CONFIRMED" : "PENDING";
 
-      const [order] = await OnlineOrder.create(
-        [
-          {
-            orderNumber,
-            orderSource: isStaffOrder ? "STAFF" : "ONLINE",
-            createdBy: admin?.email ?? null,
+      const order = new OnlineOrder({
+        orderNumber,
+        orderSource: isStaffOrder ? "STAFF" : "ONLINE",
+        createdBy: admin?.email ?? null,
 
-            customer: {
-              name: customerName || "Walk-in Customer",
-              phone: customerPhone || "N/A",
-              address: customerAddress || "Store pickup",
-              notes,
-            },
-
-            items: orderItems,
-
-            subtotal,
-            discount: promo.discount,
-            promoCode: promo.promoCode,
-            promoId: promo.promoId,
-
-            tax,
-            deliveryFee,
-            total,
-
-            paymentMethod,
-            paymentStatus,
-            paidAt: paymentStatus === "PAID" ? new Date() : null,
-            status,
-          },
-        ],
-        {
-          session: transactionSession,
+        customer: {
+          name: customerName || "Walk-in Customer",
+          phone: customerPhone || "N/A",
+          address: customerAddress || "Store pickup",
+          notes,
         },
-      );
+
+        items: orderItems,
+
+        subtotal,
+        discount: promo.discount,
+        promoCode: promo.promoCode,
+        promoId: promo.promoId,
+
+        tax,
+        deliveryFee,
+        total,
+
+        paymentMethod,
+        paymentStatus,
+        paidAt: paymentStatus === "PAID" ? new Date() : null,
+        status,
+      });
+
+      // Save the order inside the existing MongoDB transaction.
+      await order.save({
+        session: transactionSession,
+      });
 
       createdOrder = {
         orderNumber: order.orderNumber,
