@@ -145,12 +145,12 @@ function ProductCard({ product, priority = false }: ProductCardProps) {
         image: imageSrc,
         size: selectedSize,
         color: selectedColor,
+        quantity: 1,
       },
     });
 
     dispatch({ type: "OPEN_CART" });
   };
-
   return (
     <article className="flex h-full w-full min-w-0 flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-shadow duration-200 hover:shadow-md">
       {/* Product image */}
