@@ -526,7 +526,12 @@ export function Sidebar() {
 
         {/* CIRCULAR COUNTRY FLAG LANGUAGE SWITCHER */}
 
-        <div className="flex justify-center border-b border-gray-100 px-3 py-2">
+        <div
+          className={cn(
+            "flex justify-center border-b border-gray-100 py-2",
+            isCollapsed ? "px-1" : "px-3",
+          )}
+        >
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -535,48 +540,44 @@ export function Sidebar() {
                 size="sm"
                 disabled={!isReady}
                 aria-label={t("settings.language")}
-                className="
-          group
-          relative
-          h-9
-          w-full
-          justify-between
-          rounded-full
-          border
-          border-white/80
-          bg-white/60
-          px-3
-          text-xs
-          text-slate-700
-          shadow-sm
-          backdrop-blur-xl
-          transition-all
-          duration-300
-          hover:border-teal-200
-          hover:bg-teal-50/70
-          hover:shadow-md
-          active:scale-[0.98]
-        "
+                className={cn(
+                  "group relative h-9 rounded-full border border-white/80 bg-white/60 text-xs text-slate-700 shadow-sm backdrop-blur-xl transition-all duration-300 hover:border-teal-200 hover:bg-teal-50/70 hover:shadow-md active:scale-[0.98]",
+                  isCollapsed
+                    ? "w-9 justify-center p-0"
+                    : "w-full justify-between px-3",
+                )}
               >
-                <span className="flex items-center gap-2">
+                <span
+                  className={cn(
+                    "flex items-center",
+                    isCollapsed ? "justify-center" : "gap-2",
+                  )}
+                >
                   <LanguageFlag locale={locale} />
 
-                  <span className="text-sm font-medium text-slate-700">
-                    {LOCALE_LABELS[locale]}
-                  </span>
+                  {!isCollapsed && (
+                    <span className="text-sm font-medium text-slate-700">
+                      {LOCALE_LABELS[locale]}
+                    </span>
+                  )}
                 </span>
+
+                {isCollapsed && (
+                  <span className="sr-only">{LOCALE_LABELS[locale]}</span>
+                )}
               </Button>
             </DropdownMenuTrigger>
 
             <DropdownMenuContent
-              align="center"
-              sideOffset={6}
+              side={isCollapsed ? "right" : "bottom"}
+              align={isCollapsed ? "start" : "center"}
+              sideOffset={8}
               className="
         w-52
         rounded-2xl
         border
         border-white/70
-        bg-white/85
+        bg-white/95
         p-1.5
         shadow-xl
         backdrop-blur-2xl
