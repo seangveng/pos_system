@@ -277,6 +277,7 @@ export function useOverviewData() {
   // ============================================================
 
   const averageOrder = safeNumber(summary?.averagePaidOrderValue);
+  const productsSold = safeNumber(summary?.productsSold);
 
   // ============================================================
   // PAYMENT METHODS
@@ -326,6 +327,7 @@ export function useOverviewData() {
 
     totalRevenue,
     totalTransactions,
+    productsSold,
 
     successfulTransactions,
     pendingTransactions,
