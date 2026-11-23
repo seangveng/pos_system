@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import type { Promo } from "../types/promos";
+import type { Promo } from "@/types/promos";
 
 import { getPromos, togglePromo } from "../actions/promos";
 
