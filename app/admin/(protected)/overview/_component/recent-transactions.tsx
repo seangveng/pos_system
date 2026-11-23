@@ -86,14 +86,19 @@ function getPaymentMethodLabel(method: string, t: (key: string) => string) {
   switch (method.toUpperCase()) {
     case "CASH":
       return t("overview.paymentMethods.names.cash");
+
     case "CARD":
       return t("overview.paymentMethods.names.card");
+
     case "KHQR":
       return t("overview.paymentMethods.names.khqr");
+
     case "ACLEDA":
       return t("overview.paymentMethods.names.acleda");
+
     case "ABA":
       return t("overview.paymentMethods.names.aba");
+
     default:
       return method;
   }
@@ -119,10 +124,9 @@ export default function RecentTransactions({
     }).format(parsedDate);
   };
 
+  // Transaction uses "gateway" for the payment method.
   const getPaymentMethod = (transaction: Transaction) => {
-    const method = transaction.paymentMethod ?? transaction.gateway ?? "OTHER";
-
-    return getPaymentMethodLabel(method, t);
+    return getPaymentMethodLabel(transaction.gateway || "OTHER", t);
   };
 
   return (
@@ -149,7 +153,6 @@ export default function RecentTransactions({
         ) : (
           <>
             {/* Desktop */}
-
             <div className="hidden overflow-x-auto md:block">
               <table className="w-full text-sm">
                 <thead className="border-y bg-muted/30">
@@ -231,7 +234,6 @@ export default function RecentTransactions({
             </div>
 
             {/* Mobile */}
-
             <div className="divide-y md:hidden">
               {transactions.map((transaction) => (
                 <div key={transaction.id} className="space-y-3 p-4">
