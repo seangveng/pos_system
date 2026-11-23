@@ -144,9 +144,6 @@ const getCachedAdminOrders = unstable_cache(
     }
 
     const orders = await OnlineOrder.find(filter)
-      // IMPORTANT:
-      // Exclude potentially large Base64 product images.
-      // Keep the remaining order information.
       .select("-items.image")
       .sort({ createdAt: -1 })
       .limit(200)
@@ -300,7 +297,6 @@ function getPromoDateBoundary(
 
   let dateString: string;
 
-  // Handle date-only values directly.
   if (typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
     if (!isValidDateOnly(value)) {
       return null;
@@ -322,9 +318,7 @@ function getPromoDateBoundary(
     }).formatToParts(date);
 
     const year = parts.find((part) => part.type === "year")?.value;
-
     const month = parts.find((part) => part.type === "month")?.value;
-
     const day = parts.find((part) => part.type === "day")?.value;
 
     if (!year || !month || !day) {
@@ -370,39 +364,31 @@ async function calculatePromoDiscount(
     throw new Error("PROMO_INVALID");
   }
 
-  // Check manually enabled/disabled status.
   if (!promo.isActive) {
     throw new Error("PROMO_INACTIVE");
   }
 
   const now = new Date();
 
-  // Normalize dates using Cambodia timezone.
   const startDate = getPromoDateBoundary(promo.startDate, false);
-
   const endDate = getPromoDateBoundary(promo.endDate, true);
 
-  // Reject invalid stored dates.
   if ((promo.startDate && !startDate) || (promo.endDate && !endDate)) {
     throw new Error("PROMO_INVALID_DATE");
   }
 
-  // Reject inconsistent date ranges.
   if (startDate && endDate && startDate > endDate) {
     throw new Error("PROMO_INVALID_DATE");
   }
 
-  // Check start date.
   if (startDate && now < startDate) {
     throw new Error("PROMO_NOT_STARTED");
   }
 
-  // Check expiry date.
   if (endDate && now > endDate) {
     throw new Error("PROMO_EXPIRED");
   }
 
-  // Check minimum order amount.
   const minimumOrder = Number(promo.minimumOrder ?? 0);
 
   if (!Number.isFinite(minimumOrder) || minimumOrder < 0) {
@@ -413,7 +399,6 @@ async function calculatePromoDiscount(
     throw new Error("PROMO_MINIMUM_ORDER");
   }
 
-  // Check usage limit.
   if (
     promo.usageLimit !== null &&
     promo.usageLimit !== undefined &&
@@ -422,7 +407,6 @@ async function calculatePromoDiscount(
     throw new Error("PROMO_LIMIT_REACHED");
   }
 
-  // Validate discount configuration.
   const discountValue = Number(promo.discountValue);
 
   if (!Number.isFinite(discountValue) || discountValue <= 0) {
@@ -437,7 +421,6 @@ async function calculatePromoDiscount(
     throw new Error("PROMO_INVALID");
   }
 
-  // Calculate discount using MongoDB promotion data.
   const rawDiscount =
     promo.discountType === "percentage"
       ? (subtotal * discountValue) / 100
@@ -485,9 +468,6 @@ async function calculatePromoDiscount(
 // PROMOTION ERROR RESPONSE
 // ======================================================
 
-/**
- * Return consistent promotion errors using shared types.
- */
 function getPromoErrorResponse(code: PromoErrorCode) {
   const messages: Record<PromoErrorCode, string> = {
     PROMO_INVALID: "This promo code does not exist or is invalid.",
@@ -617,7 +597,6 @@ export async function GET(request: NextRequest) {
       ? paymentStatusParam
       : "";
 
-    // The Refresh button sends refresh=1 to bypass the current server cache.
     const forceRefresh = searchParams.get("refresh") === "1";
 
     if (forceRefresh) {
@@ -803,7 +782,11 @@ export async function POST(request: NextRequest) {
 
     await connectDB();
 
-    session = await mongoose.startSession();
+    // Create one MongoDB session for this order transaction.
+    // Keep a non-optional reference for all transaction operations.
+    const transactionSession = await mongoose.startSession();
+
+    session = transactionSession;
 
     let createdOrder:
       | {
@@ -819,7 +802,7 @@ export async function POST(request: NextRequest) {
         }
       | undefined;
 
-    await session.withTransaction(async () => {
+    await transactionSession.withTransaction(async () => {
       const ids = [...new Set(items.map((item) => item.id))];
 
       const products = await Product.find({
@@ -827,7 +810,7 @@ export async function POST(request: NextRequest) {
           $in: ids,
         },
         status: "active",
-      }).session(session);
+      }).session(transactionSession);
 
       if (products.length !== ids.length) {
         throw new Error("PRODUCT_UNAVAILABLE");
@@ -892,7 +875,7 @@ export async function POST(request: NextRequest) {
             },
           },
           {
-            session,
+            session: transactionSession,
           },
         );
 
@@ -911,7 +894,11 @@ export async function POST(request: NextRequest) {
         ) / 100;
 
       // Validate promotion and calculate discount from MongoDB.
-      const promo = await calculatePromoDiscount(promoCode, subtotal, session);
+      const promo = await calculatePromoDiscount(
+        promoCode,
+        subtotal,
+        transactionSession,
+      );
 
       // Subtract discount from subtotal.
       const discountedSubtotal = Math.max(0, subtotal - promo.discount);
@@ -925,7 +912,7 @@ export async function POST(request: NextRequest) {
       // Final amount = discounted subtotal + delivery fee.
       const total = Math.round((discountedSubtotal + deliveryFee) * 100) / 100;
 
-      const orderNumber = await generateOrderNumber(session);
+      const orderNumber = await generateOrderNumber(transactionSession);
 
       const paymentStatus =
         isStaffOrder && paymentMethod === "CASH" ? "PAID" : "UNPAID";
@@ -964,7 +951,7 @@ export async function POST(request: NextRequest) {
           },
         ],
         {
-          session,
+          session: transactionSession,
         },
       );
 
@@ -1045,6 +1032,7 @@ export async function POST(request: NextRequest) {
       },
     );
   } finally {
+    // Close the same session used by the transaction.
     await session?.endSession();
   }
 }
