@@ -207,9 +207,10 @@ export async function GET(request: NextRequest) {
       filter.createdAt = dateFilter;
     }
 
+    // Keep PAID as a literal type for Mongoose 9.
     const paidFilter = {
       ...filter,
-      paymentStatus: "PAID",
+      paymentStatus: "PAID" as const,
     };
 
     // 5. REPORT QUERIES
@@ -399,7 +400,7 @@ export async function GET(request: NextRequest) {
     const averagePaidOrderValue =
       paidOrders > 0 ? Math.round((totalRevenue / paidOrders) * 100) / 100 : 0;
 
-    // 7. RESPONSE
+    // 6. RESPONSE
     return NextResponse.json(
       {
         success: true,
