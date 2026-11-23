@@ -2,12 +2,9 @@
 
 import Helps from "./_components/helps";
 
-import { Sidebar } from "../(protected)/orders/_component/leftside-bar";
+import { Sidebar } from "../orders/_component/leftside-bar";
 
-import {
-  SidebarProvider,
-  useSidebar,
-} from "../../../contexts/sidebar-contexts";
+import { SidebarProvider, useSidebar } from "@/contexts/sidebar-contexts";
 
 function HelpsContent() {
   const { isCollapsed } = useSidebar();
